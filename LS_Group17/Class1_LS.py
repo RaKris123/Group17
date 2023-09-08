@@ -12,6 +12,85 @@ import csv
 # After reading the whole CSV file, plot the required data as X and Y axis.
 # In this example, we are plotting names as X-axis and ages as Y-axis.
 
+def size(x_C):
+    x_c_count = 0
+    for i in x_C:
+        x_c_count = x_c_count + 1
+        
+    return x_c_count
+
+
+def meanCalc(xC,yC):
+    x_coord_sum=0.0
+    x_coord_count=0
+    y_coord_sum = 0.0
+    y_coord_count = 0
+
+    mean_xCoord=0.0
+    mean_yCoord = 0.0
+
+    for x_point in xC:
+        x_coord_sum = x_coord_sum + float(x_point)
+        x_coord_count = size(xC)
+        
+    for y_point in yC:
+        y_coord_sum = y_coord_sum + float(y_point)
+        y_coord_count = size(yC)
+
+    mean_xCoord = x_coord_sum/x_coord_count
+    mean_yCoord = y_coord_sum/y_coord_count
+    
+    return  mean_xCoord,mean_yCoord
+
+def cov_mat_Calc(xC,yC,dV):
+    
+    cov_sumXY=0.0
+    cov_sumXX = 0.0
+    cov_sumYY = 0.0
+    
+    cov_XX = 0.0
+    cov_XY = 0.0
+    cov_YY = 0.0
+    
+    result = meanCalc(xC, yC)
+    mean_x, _ = result
+    _, mean_y = result
+    
+    for x,y in dV:
+        cov_sumXY = cov_sumXY + (x - mean_x) * (y - mean_y)
+        cov_sumXX = cov_sumXX + (x - mean_x) * (x - mean_x)
+        cov_sumYY = cov_sumYY + (y - mean_y) * (y - mean_y)
+        
+    cov_XX = cov_sumXX/size(dV)
+    cov_XY= cov_sumXY/size(dV)
+    cov_YY = cov_sumYY/size(dV)
+    
+    cov_mat = [[cov_XX,cov_XY],[cov_XY,cov_YY]]
+    
+    return cov_mat
+
+def covariance(xC,yC,dV):
+
+    cov_sumXX = 0.0
+    cov_sumYY = 0.0
+    
+    cov_XX = 0.0
+    
+    cov_YY = 0.0
+    
+    result = meanCalc(xC, yC)
+    mean_x, _ = result
+    _, mean_y = result
+    
+    for x,y in dV:
+        cov_sumXX = cov_sumXX + (x - mean_x) * (x - mean_x)
+        cov_sumYY = cov_sumYY + (y - mean_y) * (y - mean_y)
+        
+    cov_mat = [[cov_XX,0],[0,cov_YY]]
+    
+    return cov_mat
+    
+    
 #class1 lists for x,y coordinates
 xCoord1 = []
 yCoord1 = []
@@ -24,11 +103,13 @@ yCoord3 = []
 
 
 #class1 path
-path1 = "Class1.csv"
+path1 = "Class1_train.csv"
 #class2 path
-path2 = "Class2.csv"
+path2 = "Class2_train.csv"
 #class3 path
-path3 = "Class3.csv"
+path3 = "Class3_train.csv"
+
+
 
 #class1 opening file with path in readable mode and giving it as an alias
 with open(path1, 'r') as dataset1:
@@ -41,45 +122,18 @@ with open(path1, 'r') as dataset1:
             pass
         
         
-x_coord1_sum=0.0
-x_coord1_count=0
+mean_x1,mean_y1 = meanCalc(xCoord1, yCoord1) 
 
-mean_xCoord1=0
+print('\nMean vector of class 1 of LS class is:[', mean_x1,',',mean_y1,']')
 
-for x_point1 in xCoord1:
-    x_coord1_sum = x_coord1_sum + float(x_point1)
-    x_coord1_count = x_coord1_count + 1
-
-mean_xCoord1 = x_coord1_sum/x_coord1_count
-
-print('\nMean of X coordinates of class 1 of LS class is: ', mean_xCoord1)
-
-y_coord1_sum=0.0
-y_coord1_count=0
-
-mean_yCoord1=0
-
-for y_point1 in yCoord1:
-    y_coord1_sum = y_coord1_sum + float(y_point1)
-    y_coord1_count = y_coord1_count + 1
-
-mean_yCoord1 = y_coord1_sum/y_coord1_count
-
-print('\nMean of Y coordinates of class 1 of LS class is: ', mean_yCoord1)
-
-
+##############
 datavector1 = []
-for i in range(x_coord1_count):
+for i in range(size(xCoord1)):
     datavector1.append((xCoord1[i],yCoord1[i]))
-    
+        
+print("\nCovariance matrix is: - ", cov_mat_Calc(xCoord1, yCoord1, datavector1))   
 
-cov_sum1=0.0
-for x,y in datavector1:
-    cov_sum1 = cov_sum1 + (x - mean_xCoord1)*(y - mean_yCoord1)/x_coord1_count
-
-
-print('\nCovariance of class 1 of LS class1 is:', cov_sum1)
-
+######################################################################################
 
 #class2
 with open(path2, 'r') as dataset2:
@@ -91,33 +145,23 @@ with open(path2, 'r') as dataset2:
         except (ValueError, IndexError): 
             pass
         
+mean_x2,mean_y2 = meanCalc(xCoord2, yCoord2) 
+
+print('\nMean vector of class 2 of LS class is:[', mean_x2,',',mean_y2,']')
+
+
+datavector2 = []
+for i in range(size(xCoord2)):
+    datavector2.append((xCoord2[i],yCoord2[i]))
         
-x_coord2_sum=0.0
-x_coord2_count=0
+print("\nCovariance matrix is: - ", cov_mat_Calc(xCoord2, yCoord2, datavector2))
+print(np.cov(xCoord2,yCoord2))
+# =============================================================================
+# print('\nCovariance of class 2 of LS class is:', cov_sum2/x_coord2_count)
+# =============================================================================
 
-mean_xCoord2=0
-
-for x_point2 in xCoord2:
-    x_coord2_sum = x_coord2_sum + float(x_point2)
-    x_coord2_count = x_coord2_count + 1
-
-mean_xCoord2 = x_coord2_sum/x_coord2_count
-
-print('\nMean of X coordinates of class 2 of LS class is: ', mean_xCoord2)
-
-y_coord2_sum=0.0
-y_coord2_count=0
-
-mean_yCoord2=0
-
-for y_point2 in yCoord2:
-    y_coord2_sum = y_coord2_sum + float(y_point2)
-    y_coord2_count = y_coord2_count + 1
-
-mean_yCoord2 = y_coord2_sum/y_coord2_count
-
-print('\nMean of Y coordinates of class 2 of LS class is: ', mean_yCoord2)
       
+
 #class3        
 with open(path3, 'r') as dataset3: 
     grid3 = csv.reader(dataset3)
@@ -129,43 +173,25 @@ with open(path3, 'r') as dataset3:
             pass
         
         
+mean_x3,mean_y3 = meanCalc(xCoord3, yCoord3) 
+print('\nMean vector of class 2 of LS class is:[', mean_x3,',',mean_y3,']')
+
+datavector3 = []
+for i in range(size(xCoord3)):
+    datavector3.append((xCoord3[i],yCoord3[i]))
         
-x_coord3_sum=0.0
-x_coord3_count=0
-
-mean_xCoord3=0
-
-for x_point3 in xCoord3:
-    x_coord3_sum = x_coord3_sum + float(x_point3)
-    x_coord3_count = x_coord3_count + 1
-
-mean_xCoord3 = x_coord3_sum/x_coord3_count
-
-print('\nMean of X coordinates of class 3 of LS class is: ', mean_xCoord3)
-
-y_coord3_sum=0.0
-y_coord3_count=0
-
-mean_yCoord3=0
-
-for y_point3 in yCoord3:
-    y_coord3_sum = y_coord3_sum + float(y_point3)
-    y_coord3_count = y_coord3_count + 1
-
-mean_yCoord3 = y_coord3_sum/y_coord3_count
-
-print('\nMean of Y coordinates of class 3 of LS class is: ', mean_yCoord3)
-
+print("\nCovariance matrix is: - ", cov_mat_Calc(xCoord3, yCoord3, datavector3))
+print(np.cov(xCoord3,yCoord3))
 
 #class1
 plt.scatter(xCoord1, yCoord1, color='g', s=0.75, label='class 1')
-plt.scatter(mean_xCoord1, mean_yCoord1, color='black', s=4.5, label='mean vector class1')
+plt.scatter(mean_x1, mean_y1, color='black', s=4.5)
 #class2
 plt.scatter(xCoord2, yCoord2, color='r', s=0.75, label ='class 2')
-plt.scatter(mean_xCoord2, mean_yCoord2, color='black', s=4.5, label='mean vector class2')
+plt.scatter(mean_x2, mean_y2, color='black', s=4.5)
 #class3
 plt.scatter(xCoord3, yCoord3, color='b', s=0.75, label='class 3')
-plt.scatter(mean_xCoord3, mean_yCoord3, color='black', s=4.5, label='mean vector class3')
+plt.scatter(mean_x3, mean_y3, color='black', s=4.5, label='mean vector c1, c2, c3')
 
         
 plt.xticks(rotation=75)
@@ -176,5 +202,5 @@ plt.legend()
         
 plt.show()
 
-        
+# t2 = [[t1[0][0]],[t1[0][1]]] for trNAPOSE
 
