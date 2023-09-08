@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import csv
+import seaborn as sb
 
 # %matplotlib inline
 
@@ -42,7 +43,7 @@ def meanCalc(xC,yC):
     
     return  mean_xCoord,mean_yCoord
 
-def cov_mat_Calc(xC,yC,dV):
+def fullCov(xC,yC,dV):
     
     cov_sumXY=0.0
     cov_sumXX = 0.0
@@ -69,7 +70,7 @@ def cov_mat_Calc(xC,yC,dV):
     
     return cov_mat
 
-def covariance(xC,yC,dV):
+def covMat(xC,yC,dV):
 
     cov_sumXX = 0.0
     cov_sumYY = 0.0
@@ -90,6 +91,7 @@ def covariance(xC,yC,dV):
     
     return cov_mat
     
+
     
 #class1 lists for x,y coordinates
 xCoord1 = []
@@ -130,8 +132,11 @@ print('\nMean vector of class 1 of LS class is:[', mean_x1,',',mean_y1,']')
 datavector1 = []
 for i in range(size(xCoord1)):
     datavector1.append((xCoord1[i],yCoord1[i]))
+    
+full_cov1=fullCov(xCoord1, yCoord1, datavector1)
         
-print("\nCovariance matrix is: - ", cov_mat_Calc(xCoord1, yCoord1, datavector1))   
+print("\nCovariance matrix is: - ", full_cov1) 
+  
 
 ######################################################################################
 
@@ -153,13 +158,10 @@ print('\nMean vector of class 2 of LS class is:[', mean_x2,',',mean_y2,']')
 datavector2 = []
 for i in range(size(xCoord2)):
     datavector2.append((xCoord2[i],yCoord2[i]))
+    
+    full_cov2=fullCov(xCoord2, yCoord2, datavector2)
         
-print("\nCovariance matrix is: - ", cov_mat_Calc(xCoord2, yCoord2, datavector2))
-print(np.cov(xCoord2,yCoord2))
-# =============================================================================
-# print('\nCovariance of class 2 of LS class is:', cov_sum2/x_coord2_count)
-# =============================================================================
-
+print("\nCovariance matrix is: - ", full_cov2)
       
 
 #class3        
@@ -176,16 +178,37 @@ with open(path3, 'r') as dataset3:
 mean_x3,mean_y3 = meanCalc(xCoord3, yCoord3) 
 print('\nMean vector of class 2 of LS class is:[', mean_x3,',',mean_y3,']')
 
+
 datavector3 = []
 for i in range(size(xCoord3)):
     datavector3.append((xCoord3[i],yCoord3[i]))
         
-print("\nCovariance matrix is: - ", cov_mat_Calc(xCoord3, yCoord3, datavector3))
+full_cov3 = fullCov(xCoord3, yCoord3, datavector3)
+    
+print("\nCovariance matrix is: - ",full_cov3)
 print(np.cov(xCoord3,yCoord3))
 
+avg_mat = []
+numOfmat = 3
+
+for ti in range(size(full_cov1)):
+    row = []
+    for tj in range(size(full_cov1[0])):
+                   avg_ele = (full_cov1[ti][tj] + full_cov2[ti][tj] + full_cov3[ti][tj]) / numOfmat
+                   row.append(avg_ele)
+    avg_mat.append(row)
+    
+for i in avg_mat:
+    print(i)
+
 #class1
+
 plt.scatter(xCoord1, yCoord1, color='g', s=0.75, label='class 1')
+
 plt.scatter(mean_x1, mean_y1, color='black', s=4.5)
+plt.figure(figsize=(8,6))
+sb.heatmap(avg_mat, cmap="coolwarm", square = True)
+
 #class2
 plt.scatter(xCoord2, yCoord2, color='r', s=0.75, label ='class 2')
 plt.scatter(mean_x2, mean_y2, color='black', s=4.5)
